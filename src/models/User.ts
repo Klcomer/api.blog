@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema, Types } from 'mongoose'
 
 export interface IUser extends Document {
-    _id: Types.ObjectId; // ✅ _id'yi ekliyoruz
+    _id: Types.ObjectId;
     email: string;
     password: string;
     name: string;

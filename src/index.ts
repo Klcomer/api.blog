@@ -1,18 +1,23 @@
-import express from 'express';
 import dotenv from 'dotenv';
-import cookieParser from 'cookie-parser';
-import connectDB from './config';
-import indexRoutes from './routes/index';
 
-dotenv.config();
-const app = express();
+dotenv.config({ path: "./.config.env" });
 
-app.use(express.json());
-app.use(cookieParser());
+const Main = async () => {
+    process.on("uncaughtException", err => {
+        console.error('UNCAUGHT EXCEPTION! 💥', err.stack);
+        process.exit(1);
+    });
 
-connectDB();
 
-app.use('/', indexRoutes);
+    const { app } = require('./app');
+    const server = app.listen(process.env.PORT || 5000, () => {
+        console.log(`Server is running on port ${process.env.PORT} in ${process.env.NODE_ENV} mode`);
+    });
 
-const PORT = process.env.PORT || 8000;
-app.listen(PORT, () => console.log(`Server çalışıyor: ${PORT}`));
+    process.on('unhandledRejection', (err: any) => {
+        console.error('UNHANDLED REJECTION! 💥', err.stack);
+        server.close(() => process.exit(1));
+    });
+};
+
+Main();
