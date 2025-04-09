@@ -3,7 +3,6 @@ import express, { Application } from 'express';
 // import morgan from 'morgan';
 // import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
-import path from 'path';
 
 import { authRoutes } from './routes/authRoutes';
 
