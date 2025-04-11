@@ -33,10 +33,31 @@ export class AuthService {
             const isMatch = await bcrypt.compare(password, user.password);
             if (!isMatch) throw new AppError(401, 'Şifre hatalı.');
 
-            const token = Session.encrypt(user.id.toString()); // User id'si burada kullanılıyor
+            const token = Session.encrypt(user.id.toString());
             return token;
         } catch (error) {
             throw new AppError(500, 'Giriş sırasında bir hata oluştu.');
         }
     }
+
+    async generateResetToken(email: string) {
+        const user = await User.findOne({ where: { email } });
+        if (!user) throw new AppError(404, 'Kullanıcı bulunamadı.');
+
+        const token = Session.encrypt(user.id.toString());
+        return token;
+    }
+
+    async resetPassword(token: string, newPassword: string) {
+        const userId = Session.decrypt(token);  
+        const user = await User.findOne({ _id: userId });
+        if (!user) throw new AppError(404, 'Kullanıcı bulunamadı.');
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        user.password = hashedPassword;
+        await user.save();
+        return { success: true, message: 'Şifre başarıyla sıfırlandı.' };
+    }   
 }
+
+export const authService = new AuthService();
