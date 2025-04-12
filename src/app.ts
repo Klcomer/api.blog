@@ -5,6 +5,7 @@ import express, { Application } from 'express';
 import cookieParser from 'cookie-parser';
 
 import { authRoutes } from './routes/authRoutes';
+import errorHandler from './middleware/errorHandler';
 
 const app: Application = express();
 
@@ -31,5 +32,8 @@ app.use('/api/v1/auth', authRoutes);
 app.all("*", (req, res) => {
     res.status(404).json({ success: false, message: "Route not found" });
 });
+
+// Global Error Handler
+app.use(errorHandler);
 
 export { app };
