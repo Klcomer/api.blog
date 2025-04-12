@@ -1,6 +1,6 @@
 import express, { Application } from 'express';
 // import cors from 'cors';
-// import morgan from 'morgan';
+import morgan from 'morgan';
 // import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 
@@ -12,7 +12,7 @@ const app: Application = express();
 app.enable("trust proxy");
 
 // Logging
-// app.use(morgan(process.env.NODE_ENV === "development" ? "dev" : "combined"));
+app.use(morgan('dev'));
 
 // Parsers
 app.use(express.json({ limit: '15mb' }));
