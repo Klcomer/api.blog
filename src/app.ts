@@ -3,6 +3,10 @@ import express, { Application } from 'express';
 import morgan from 'morgan';
 // import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
+import { config } from 'dotenv';
+// Load environment variables
+config();
+
 
 import { authRoutes } from './routes/authRoutes';
 import errorHandler from './middleware/errorHandler';
@@ -12,8 +16,11 @@ const app: Application = express();
 app.enable("trust proxy");
 
 // Logging
-app.use(morgan('dev'));
-
+if (process.env.NODE_ENV === "development") {
+    app.use(morgan("dev"))
+} else {
+    app.use(morgan("combined"))
+}
 // Parsers
 app.use(express.json({ limit: '15mb' }));
 app.use(express.urlencoded({ extended: true, limit: '15mb' }));

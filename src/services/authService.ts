@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import User from '../models/User'; // User modelini uygun şekilde import et
 import Session from '../utils/session';
 import AppError from '../utils/appError';
+import { emailService } from '../utils/email';
 
 export class AuthService {
     private validateRequiredFields(fields: { [key: string]: any }, fieldNames: string[]) {
@@ -66,7 +67,11 @@ export class AuthService {
 
             // Token oluşturma işlemi
             const token = Session.encrypt(user._id.toString());
-            return token;
+            
+            // Email gönderme
+            await emailService.sendPasswordResetEmail(email, token);
+            
+            return { message: 'Şifre sıfırlama bağlantısı email adresinize gönderildi.' };
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(500, 'Token oluşturulurken bir hata oluştu.');
@@ -87,7 +92,7 @@ export class AuthService {
             user.password = hashedPassword;
             await user.save();
 
-            return { message: 'Şifre başarıyla güncellendi.' };
+            return { message: 'Şifreniz başarıyla güncellendi.' };
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(500, 'Şifre sıfırlama sırasında bir hata oluştu.');
