@@ -1,8 +1,9 @@
 import bcrypt from 'bcrypt';
-import User from '../models/User'; // User modelini uygun şekilde import et
+import User from '../models/userModel';
 import Session from '../utils/session';
 import AppError from '../utils/appError';
 import { emailService } from '../utils/email';
+import mongoose from 'mongoose';
 
 export class AuthService {
     private validateRequiredFields(fields: { [key: string]: any }, fieldNames: string[]) {
@@ -27,7 +28,8 @@ export class AuthService {
             const user = await User.create({
                 email,
                 password: hashedPassword,
-                name
+                name,
+                role: 'user'
             });
 
             return { email: user.email, name: user.name };
@@ -49,7 +51,7 @@ export class AuthService {
             const isMatch = await bcrypt.compare(password, user.password);
             if (!isMatch) throw new AppError(401, 'Şifre hatalı.');
 
-            const token = Session.encrypt(user._id.toString());
+            const token = Session.encrypt((user._id as mongoose.Types.ObjectId).toString());
             return token;
         } catch (error) {
             if (error instanceof AppError) throw error;
@@ -66,7 +68,7 @@ export class AuthService {
             if (!user) throw new AppError(404, 'Kullanıcı bulunamadı.');
 
             // Token oluşturma işlemi
-            const token = Session.encrypt(user._id.toString());
+            const token = Session.encrypt((user._id as mongoose.Types.ObjectId).toString());
             
             // Email gönderme
             await emailService.sendPasswordResetEmail(email, token);
