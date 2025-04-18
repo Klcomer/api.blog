@@ -1,17 +1,19 @@
 import { Request, Response, NextFunction } from 'express'
 import Session from '../utils/session'
-import User from '../models/User'
+import User from '../models/userModel'
 import AppError from '../utils/appError'
+import { Types } from 'mongoose'
 
 export interface AuthRequest extends Request {
     user?: {
         id: string;
         email: string;
         name: string;
+        role: string;
     };
 }
 
-const authMiddleware = async (req: AuthRequest, res: Response, next: NextFunction) => {
+const isLoggedIn = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const session = req.cookies.session
         if (!session) throw new AppError(401, 'Giriş yapmalısınız.')
@@ -22,9 +24,10 @@ const authMiddleware = async (req: AuthRequest, res: Response, next: NextFunctio
         if (!user) throw new AppError(401, 'Geçersiz oturum.')
 
         req.user = {
-            id: user._id.toString(),
+            id: (user._id as Types.ObjectId).toString(),
             email: user.email,
-            name: user.name
+            name: user.name,
+            role: user.role
         }
 
         next()
@@ -33,4 +36,13 @@ const authMiddleware = async (req: AuthRequest, res: Response, next: NextFunctio
     }
 }
 
-export default authMiddleware
+export const restrictTo = (...roles: string[]) => {
+    return (req: AuthRequest, res: Response, next: NextFunction) => {
+        if (!req.user || !roles.includes(req.user.role)) {
+            return next(new AppError(403, 'Bu işlem için yetkiniz yok.'));
+        }
+        next();
+    };
+};
+
+export default isLoggedIn

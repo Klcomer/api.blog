@@ -100,6 +100,17 @@ export class AuthService {
             throw new AppError(500, 'Şifre sıfırlama sırasında bir hata oluştu.');
         }
     }
+
+    async getMe(userId: string) {
+        try {
+            const user = await User.findById(userId).select('-password');
+            if (!user) throw new AppError(404, 'Kullanıcı bulunamadı.');
+            return user;
+        } catch (error) {
+            if (error instanceof AppError) throw error;
+            throw new AppError(500, 'Kullanıcı bilgileri alınırken bir hata oluştu.');
+        }
+    }
 }
 
 export const authService = new AuthService();

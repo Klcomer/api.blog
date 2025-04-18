@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { AuthService} from '../services/authService';
 import catchAsync from '../utils/catchAsync';
+import { AuthRequest } from '../middleware/authMiddleware';
 
 const authService = new AuthService();
 
@@ -34,5 +35,11 @@ export const resetPassword = catchAsync(async (req: Request, res: Response) => {
     const { token, newPassword } = req.body;
     const data = await authService.resetPassword(token, newPassword);
     res.json({ success: true, data });
+});
+
+export const getMe = catchAsync(async (req: AuthRequest, res: Response) => {
+    if (!req.user) throw new Error('User not found');
+    const user = await authService.getMe(req.user.id);
+    res.status(200).json({ success: true, data: user });
 });
 
