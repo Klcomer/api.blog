@@ -45,7 +45,7 @@ export class AuthService {
             // Validasyon
             this.validateRequiredFields({ email, password }, ['email', 'password']);
 
-            const user = await User.findOne({ email });
+            const user = await User.findOne({ email }).select('+password');
             if (!user) throw new AppError(401, 'Kullanıcı bulunamadı.');
 
             const isMatch = await bcrypt.compare(password, user.password);

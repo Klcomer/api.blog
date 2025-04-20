@@ -1,5 +1,5 @@
-import User from "models/userModel";
-import AppError from "utils/appError";
+import User from "../models/userModel";
+import AppError from "../utils/appError";
 
 export class UserService{
 

@@ -9,6 +9,7 @@ config();
 
 
 import { authRoutes } from './routes/authRoutes';
+import { userRoutes } from './routes/userRoutes';
 import errorHandler from './middleware/errorHandler';
 
 const app: Application = express();
@@ -34,6 +35,8 @@ app.use(cookieParser());
 
 // API Routes
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/user', userRoutes);
+
 
 // 404 Handler
 app.all("*", (req, res) => {

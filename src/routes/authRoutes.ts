@@ -16,7 +16,7 @@ router
     .post("/login", login)
     .get("/logout", logout)
     .post("/forget-password", forgetPassword)
-    .patch("/reset-password/:token", resetPassword)
+    .post("/reset-password", resetPassword)
     .get("/me", isLoggedIn, getMe);
 
 export { router as authRoutes };

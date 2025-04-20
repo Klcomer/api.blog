@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { AuthService} from '../services/authService';
 import catchAsync from '../utils/catchAsync';
 import { AuthRequest } from '../middleware/authMiddleware';
+import  AppError  from '../utils/appError';
 
 const authService = new AuthService();
 
@@ -32,7 +33,13 @@ export const forgetPassword = catchAsync(async (req: Request, res: Response) => 
 });
 
 export const resetPassword = catchAsync(async (req: Request, res: Response) => {
-    const { token, newPassword } = req.body;
+    const { token } = req.query;
+    const { newPassword } = req.body;
+    
+    if (!token || typeof token !== 'string') {
+        throw new AppError(400, 'Token gerekli.');
+    }
+
     const data = await authService.resetPassword(token, newPassword);
     res.json({ success: true, data });
 });
